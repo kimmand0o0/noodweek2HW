@@ -24,10 +24,10 @@ app.get('/', (req, res) => {
 //라우터 연결 해줌
 app.use('/api', require('./routes/signup'))
 app.use('/api', require('./routes/login'))
+app.use('/api', require('./routes/like'))
 app.use('/api', require('./routes/post'))
 app.use('/api', require('./routes/comment'))
-// app.use('/api', require('./routes/postLike'))
-// app.use('/api', require('./routes/commentLike'))
+
 
 app.listen(app.get('port'), () => {
     console.log(app.get('port'), '번 포트에서 대기 중')
