@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 //라우터 연결 해줌
 app.use('/api', require('./routes/signup'))
 app.use('/api', require('./routes/login'))
-// app.use('/api', require('./routes/post'))
+app.use('/api', require('./routes/post'))
 // app.use('/api', require('./routes/comment'))
 // app.use('/api', require('./routes/postLike'))
 // app.use('/api', require('./routes/commentLike'))

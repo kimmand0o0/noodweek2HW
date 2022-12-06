@@ -27,6 +27,15 @@ module.exports = {
         },
         onDelete: 'cascade',
       },
+      nickname: {
+        type: Sequelize.DataTypes.STRING,
+        allowNull: false,
+        references: {
+          model: "Users",
+          key: "nickname",
+        },
+        onDelete: "cascade",
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DataTypes.DATE,

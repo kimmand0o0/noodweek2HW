@@ -1,7 +1,10 @@
+require("dotenv").config();
+
 const express = require("express");
 const { userInfo } = require("os");
 const { stringify } = require("querystring");
 const router = express.Router();
+const crypto = require("crypto");
 
 const { Users } = require("../models");
 
@@ -63,11 +66,19 @@ router.post("/signup", async (req, res) => {
       return res.status(412).json({ errorMessage: "중복된 닉네임입니다." });
     }
 
+    // 비밀번호 암호화. crypto 모듈로 단방향 해시 암호화 진행
+    const secretPW = crypto
+      .createHash(process.env.PW_KEY)
+      .update(password)
+      .digest(process.env.INCOD);
+
     // 비밀번호 확인과 닉네임 중복 체크 완료하면 DB에 정보를 등록 후 결과 내보내주기
-    await Users.create({ nickname, password });
+    await Users.create({ nickname, password : secretPW });
     res.status(200).json({ message: "회원 가입에 성공하였습니다." });
   } catch (err) {
-    res.status(400).json({errorMessage: "요청한 데이터 형식이 올바르지 않습니다."})
+    res
+      .status(400)
+      .json({ errorMessage: "요청한 데이터 형식이 올바르지 않습니다." });
   }
 });
 

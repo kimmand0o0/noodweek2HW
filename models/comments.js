@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.Users, { foreignKey: 'userId' });
+      this.belongsTo(models.Users, { foreignKey: 'nickname' });
       this.belongsTo(models.Posts, { foreignKey: 'postId' });
     }
   }
@@ -46,7 +47,16 @@ module.exports = (sequelize, DataTypes) => {
         },
         onDelete: 'cascade',
       },
-      content: {
+      nickname: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        references: {
+          model: "Users",
+          key: "nickname",
+        },
+        onDelete: "cascade",
+      },
+      comment: {
         type: DataTypes.STRING,
         allowNull: false,
       },

@@ -1,7 +1,9 @@
+require("dotenv").config();
+
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
+const crypto = require("crypto");
 
 const { Users } = require("../models");
 
@@ -13,7 +15,6 @@ const { Users } = require("../models");
 
 // {  "nickname": "Developer",  "password": "1234"}
 
-
 //==================================
 //
 //          Login - 로그인
@@ -24,16 +25,23 @@ router.post("/login", async (req, res) => {
     //닉네임, 비밀번호를 request에서 전달받기
     const { nickname, password } = req.body;
 
+    // 다시 암호화 해준 후 비교한다.
+    const secretPW = crypto
+      .createHash(process.env.PW_KEY)
+      .update(password)
+      .digest(process.env.INCOD);
+
     // 입력한 닉네임과 일치하는 유저 정보를 DB에서 가져 찾아보기
     const existsUser = await Users.findOne({
       where: {
         nickname,
+        password: secretPW,
       },
     });
 
     // 로그인 버튼을 누른 경우 닉네임과 비밀번호가 데이터베이스에 등록됐는지 확인한 뒤,
     // 하나라도 맞지 않는 정보가 있다면 "닉네임 또는 패스워드를 확인해주세요."라는 에러 메세지를 response에 포함하기
-    if (!existsUser || existsUser.password !== password) {
+    if (!existsUser) {
       return res
         .status(412)
         .json({ errorMessage: "닉네임 또는 패스워드를 확인해주세요." });
@@ -52,9 +60,9 @@ router.post("/login", async (req, res) => {
   }
 });
 
-function createAccessToken(id) {
+function createAccessToken(userId) {
   const accessToken = jwt.sign(
-    { userId: id },
+    { userId },
     process.env.KEY, // 시크릿 키
     { expiresIn: "10m" } // 유효 시간
   );
