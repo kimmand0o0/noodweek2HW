@@ -31,8 +31,6 @@ router.post("/login", async (req, res) => {
       },
     });
 
-    const id = existsUser.userId;
-
     // 로그인 버튼을 누른 경우 닉네임과 비밀번호가 데이터베이스에 등록됐는지 확인한 뒤,
     // 하나라도 맞지 않는 정보가 있다면 "닉네임 또는 패스워드를 확인해주세요."라는 에러 메세지를 response에 포함하기
     if (!existsUser || existsUser.password !== password) {
@@ -42,15 +40,9 @@ router.post("/login", async (req, res) => {
     }
 
     // 로그인 성공 시 로그인 토큰을 클라이언트에게 Cookie로 전달하기
-    const accessToken = createAccessToken(id);
-    const refreshToken = createRefreshToken();
-    console.log(accessToken);
-    console.log("---");
-    console.log(refreshToken);
-
     //tokenObject[refreshToken] = id; // Refresh Token을 가지고 해당 유저의 정보를 서버에 저장합니다.
-    res.cookie("accessToken", accessToken); // Access Token을 Cookie에 전달한다.
-    res.cookie("refreshToken", refreshToken); // Refresh Token을 Cookie에 전달한다.
+    res.cookie("accessToken", createAccessToken(existsUser.userId)); // Access Token을 Cookie에 전달한다.
+    res.cookie("refreshToken", createRefreshToken()); // Refresh Token을 Cookie에 전달한다.
 
     return res
       .status(200)
