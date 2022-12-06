@@ -27,7 +27,7 @@ router.get("/posts", async (req, res) => {
         "postLike",
       ],
       // 내림차순 정렬
-      order: [["createdAt"]],
+      order: [["createdAt","DESC"]],
     });
 
     res.status(200).json({ data: posts });
@@ -132,8 +132,7 @@ router.get("/posts/:postId", async (req, res) => {
 //
 //==================================
 router.put("/posts/:postId", auth, async (req, res) => {
-  // try {
-
+  try {
   const { postId } = req.params;
   const { title, content } = req.body;
   const { userId } = jwt.verify(req.cookies.accessToken, process.env.KEY);
@@ -158,9 +157,9 @@ router.put("/posts/:postId", auth, async (req, res) => {
     await Posts.update({ title, content }, { where: { postId } });
     return res.status(200).json({ msg: "게시글을 수정하였습니다." });
   }
-  // } catch (error) {
-  //   return res.status(400).json({ msg: "게시글 수정에 실패하였습니다." });
-  // }
+  } catch (error) {
+    return res.status(400).json({ msg: "게시글 수정에 실패하였습니다." });
+  }
 });
 
 // # 401 게시글 삭제에 실패한 경우
