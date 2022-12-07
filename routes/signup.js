@@ -7,7 +7,7 @@ const router = express.Router();
 const crypto = require("crypto");
 
 const { Users } = require("../models");
-const errorCheck = require("../middlewares/errorCheck")
+// const errorCheck = require("../middlewares/errorCheck")
 
 const { Op } = require("sequelize");
 
