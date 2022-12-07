@@ -30,8 +30,8 @@ app.use("/api", require("./routes/comment"));
 
 app.use((error, req, res, next) => {
   res
-    .status(error.status || StatusCodes.BAD_REQUEST)
-    .json({ message: error.message });
+    .status(400)
+    .json({ message: "데이터 형식이 올바르지 않습니다." });
 });
 
 app.listen(app.get("port"), () => {
