@@ -49,12 +49,13 @@ router.post("/login", async (req, res) => {
 
     // 로그인 성공 시 로그인 토큰을 클라이언트에게 Cookie로 전달하기
     //tokenObject[refreshToken] = id; // Refresh Token을 가지고 해당 유저의 정보를 서버에 저장합니다.
-    res.cookie("accessToken", createAccessToken(existsUser.userId)); // Access Token을 Cookie에 전달한다.
+    const accessToken = createAccessToken(existsUser.userId)
+    res.cookie("accessToken", accessToken); // Access Token을 Cookie에 전달한다.
     res.cookie("refreshToken", createRefreshToken()); // Refresh Token을 Cookie에 전달한다.
 
     return res
       .status(200)
-      .send({ message: "Token이 정상적으로 발급되었습니다." });
+      .json({ token : accessToken });
   } catch (err) {
     res.status(400).send({ errorMessage: "로그인에 실패하였습니다." });
   }

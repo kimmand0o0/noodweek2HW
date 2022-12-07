@@ -49,7 +49,7 @@ router.post("/posts", auth, async (req, res) => {
   //예상할 수 없는 err는 try catch로 잡아줌
   try {
     const { title, content } = req.body;
-    const { userId } = jwt.verify(req.cookies.accessToken, process.env.KEY);
+    const { userId, nickname } = res.locals.user
 
     // body값이 제대로 들어오지 않았을 경우
     if (!title || !content) {
@@ -58,21 +58,8 @@ router.post("/posts", auth, async (req, res) => {
         .json({ message: "데이터 형식이 올바르지 않습니다." });
     }
 
-    // 쿠키에서 받아온 id로 정보를 찾아온다
-    const existsUser = await Users.findOne({
-      where: {
-        userId,
-      },
-    });
-
     // DB 등록되는 입력값
-    await Posts.create({
-      userId: existsUser.userId,
-      title: title,
-      nickname: existsUser.nickname,
-      content: content,
-      postLike: 0,
-    });
+    await Posts.create({ userId, title, nickname, content, postLike: 0 });
     return res.status(200).json({ message: "게시글 작성에 성공하였습니다." });
   } catch (error) {
     return res.status(400).json({ msg: "게시글 작성에 실패하였습니다." });
@@ -135,7 +122,7 @@ router.put("/posts/:postId", auth, async (req, res) => {
   try {
   const { postId } = req.params;
   const { title, content } = req.body;
-  const { userId } = jwt.verify(req.cookies.accessToken, process.env.KEY);
+  const { userId } = res.locals.user
 
   if (!title || !content) {
     return res.status(412).json({ msg: "데이터 형식이 올바르지 않습니다." });
@@ -144,9 +131,6 @@ router.put("/posts/:postId", auth, async (req, res) => {
   const changePost = await Posts.findOne({
     where: { postId },
   });
-
-  console.log("1-", changePost);
-
   // 바꿀 게시글 정보를 못 찾을 경우
   if (changePost == null || changePost.length === 0) {
     return res.status(404).json({ msg: "게시글 조회에 실패하였습니다." });
@@ -154,7 +138,7 @@ router.put("/posts/:postId", auth, async (req, res) => {
 
   // 작성자가 같을 경우에만 변경
   if (userId === changePost.userId) {
-    await Posts.update({ title, content }, { where: { postId } });
+    await Posts.update({ title, content, updateAt }, { where: { postId } });
     return res.status(200).json({ msg: "게시글을 수정하였습니다." });
   }
   } catch (error) {
@@ -172,7 +156,7 @@ router.put("/posts/:postId", auth, async (req, res) => {
 router.delete("/posts/:postId", auth, async (req, res) => {
   try {
     let { postId } = req.params;
-    const { userId } = jwt.verify(req.cookies.accessToken, process.env.KEY);
+    const { userId } = res.locals.user
 
     const delPost = await Posts.findOne({
       where: { postId },
@@ -194,5 +178,6 @@ router.delete("/posts/:postId", auth, async (req, res) => {
     return res.status(400).json({ msg: "게시글이 정상적으로 삭제되지 않았습니다." });
   }
 });
+
 
 module.exports = router;

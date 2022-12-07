@@ -17,7 +17,7 @@ const { get } = require("./signup");
 router.put("/posts/:postId/like", auth, async (req, res) => {
   try {
     const { postId } = req.params;
-    const { userId } = jwt.verify(req.cookies.accessToken, process.env.KEY);
+    const { userId, nickname } = res.locals.user
 
     const post = await Posts.findOne({ where: { postId } });
     const user = await Users.findOne({ where: { userId } });
@@ -40,11 +40,7 @@ router.put("/posts/:postId/like", auth, async (req, res) => {
     if (!islike) {
       postLike += 1;
       await Posts.update({ postLike }, { where: { postId } });
-      await PostLikes.create({
-        postId,
-        userId,
-        nickname: user.nickname,
-      });
+      await PostLikes.create({ postId, userId, nickname });
       return res
         .status(200)
         .json({ message: "게시글의 좋아요를 등록하였습니다." });

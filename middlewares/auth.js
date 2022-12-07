@@ -11,32 +11,42 @@ const { Users } = require("../models");
 //  - 로그인 토큰을 전달하지 않은 채로 로그인이 필요한 API를 호출한 경우 "로그인이 필요합니다." 라는 에러 메세지를 response에 포함하기
 //  - 로그인 토큰을 전달한 채로 로그인 API 또는 회원가입 API를 호출한 경우 "이미 로그인이 되어있습니다."라는 에러 메세지를 response에 포함하기
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   try {
+    // 토큰이 없을 경우
+    if (!req.cookies.accessToken && !req.cookies.refreshToken){
+      console.log("refreshToken이 없습니다.")
+      throw err
+    }
+
     const accessToken = req.cookies.accessToken;
     const refreshToken = req.cookies.refreshToken;
-
-    // 토큰이 없을 경우
-    if (!refreshToken && !accessToken)
-      return res.status(400).json({ message: "로그인이 필요합니다." });
-
     // validateAccessToken() = 엑세스 토큰 확인
     const isAccessTokenValidate = validateAccessToken(accessToken);
     const isRefreshTokenValidate = validateRefreshToken(refreshToken);
 
     // 리프레시 토큰이 없을 경우
-    if (!isRefreshTokenValidate)
-      return res.status(419).json({ message: "로그인이 필요합니다." });
+    if (!isRefreshTokenValidate){
+      console.log("refreshToken이 만료되었습니다.")
+      throw err
+    }
 
     // AccessToken을 확인 했을 때 만료일 경우
     if (!isAccessTokenValidate) {
       const accessTokenId = tokenObject[refreshToken];
-      if (!accessTokenId)
-        return res.status(419).json({ message: "로그인이 필요합니다." });
+      if (!accessTokenId){
+        console.log("accessTokenId이 만료되었습니다.")
+        throw err
+      }
       // 새로운 엑세스 토큰을 만들어준다.
       const newAccessToken = createAccessToken(accessTokenId);
-      return res.cookie("accessToken", newAccessToken);
+      res.cookie("accessToken", newAccessToken);
     }
+
+    const { userId } = getAccessTokenPayload(accessToken);
+    const user = await Users.findOne({raw:true, attributes:["userId", "nickname"],where:{userId}})
+    res.locals.user = user;
+    
     next();
   } catch (err) {
     return res.status(400).json({ msg: "로그인이 필요합니다." });
