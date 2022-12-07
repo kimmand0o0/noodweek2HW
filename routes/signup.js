@@ -29,6 +29,10 @@ router.post("/signup", async (req, res) => {
     // 닉네임, 비밀번호, 비밀번호 확인을 request에서 전달받기
     const { nickname, password, confirm } = req.body;
 
+    if (!nickname || !password || !confirm) {
+      throw err
+    }
+
     // 비밀번호(password)와 비밀번호확인(confirm) 비교
     // 비밀번호 확인은 비밀번호와 정확하게 일치하기
     if (password !== confirm) {
