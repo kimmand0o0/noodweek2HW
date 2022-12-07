@@ -48,8 +48,9 @@ router.post("/signup", async (req, res) => {
         .json({ errorMessage: "패스워드 형식이 일치하지 않습니다." });
     }
 
-    //닉네임은 `최소 3자 이상, 알파벳 대소문자(a~z, A~Z), 숫자(0~9)`로 구성하기
-    if (!/^(?=.*[a-zA-Z])(?=.*\d).{3,}$/.test(nickname)) {
+    // 닉네임은 `최소 3자 이상, 알파벳 대소문자(a~z, A~Z), 숫자(0~9)`로 구성하기 
+    // !/^(?=.*[a-zA-Z)(?=.*\d).{3,}$/.test(nickname)
+    if (!/^(?=.*[a-zA-Z\d]).{3,}$/.test(nickname)) {
       return res
         .status(412)
         .json({ errorMessage: "닉네임의 형식이 일치하지 않습니다." });
