@@ -5,5 +5,3 @@ node_modules
 package-lock.json
 
 config.json
-
-errorCheck.js

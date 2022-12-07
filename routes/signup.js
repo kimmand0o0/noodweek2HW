@@ -7,7 +7,7 @@ const router = express.Router();
 const crypto = require("crypto");
 
 const { Users } = require("../models");
-// const errorCheck = require("../middlewares/errorCheck")
+const errorCheck = require("../middlewares/errorCheck")
 
 const { Op } = require("sequelize");
 
@@ -31,7 +31,8 @@ router.post("/signup", async (req, res) => {
     const { nickname, password, confirm } = req.body;
 
     if (!nickname || !password || !confirm) {
-      throw errorCheck(BodyError)
+      errorCheck("DataError", res)
+      return
     }
 
     // 비밀번호(password)와 비밀번호확인(confirm) 비교
@@ -82,7 +83,6 @@ router.post("/signup", async (req, res) => {
     await Users.create({ nickname, password : secretPW });
     res.status(200).json({ message: "회원 가입에 성공하였습니다." });
   } catch (err) {
-    // errorCheck("DataError")
     res
       .status(400)
       .json({ errorMessage: "요청한 데이터 형식이 올바르지 않습니다." });
