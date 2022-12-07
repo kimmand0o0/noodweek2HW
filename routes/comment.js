@@ -85,7 +85,7 @@ router.get("/comments/:postId", async (req, res) => {
 //            댓글 수정
 //
 //==================================
-router.put("/comments/:commentId", async (req, res) => {
+router.put("/comments/:commentId", auth, async (req, res) => {
 //   try {
     // params를 통해 댓글 id 값을 가져옴
     let {commentId} = req.params;
@@ -122,7 +122,7 @@ router.put("/comments/:commentId", async (req, res) => {
 //             댓글 삭제
 //
 //==================================
-router.delete("/comments/:commentId", async (req, res) => {
+router.delete("/comments/:commentId", auth, async (req, res) => {
   try {
     // 코멘트 id를 받아옴
     let {commentId} = req.params;

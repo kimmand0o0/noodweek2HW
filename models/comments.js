@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 
-/**
+/** 주석 달아주는 곳
  * @param {import("sequelize").Sequelize} sequelize - Sequelize
  * @param {import("sequelize").DataTypes} DataTypes - Sequelize Column DataTypes
  * @return {Model} - Sequelize Model
