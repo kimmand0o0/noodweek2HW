@@ -7,6 +7,8 @@ const crypto = require("crypto");
 
 const { Users } = require("../models");
 
+const authLogin = require("../middlewares/authLogin")
+
 // 2. 로그인 API
 // 닉네임, 비밀번호를 request에서 전달받기
 // 로그인 버튼을 누른 경우 닉네임과 비밀번호가 데이터베이스에 등록됐는지 확인한 뒤,
@@ -20,7 +22,7 @@ const { Users } = require("../models");
 //          Login - 로그인
 //
 //==================================
-router.post("/login", async (req, res) => {
+router.post("/login", authLogin, async (req, res) => {
   try {
     //닉네임, 비밀번호를 request에서 전달받기
     const { nickname, password } = req.body;
@@ -49,13 +51,11 @@ router.post("/login", async (req, res) => {
 
     // 로그인 성공 시 로그인 토큰을 클라이언트에게 Cookie로 전달하기
     //tokenObject[refreshToken] = id; // Refresh Token을 가지고 해당 유저의 정보를 서버에 저장합니다.
-    const accessToken = createAccessToken(existsUser.userId)
+    const accessToken = createAccessToken(existsUser.userId);
     res.cookie("accessToken", accessToken); // Access Token을 Cookie에 전달한다.
     res.cookie("refreshToken", createRefreshToken()); // Refresh Token을 Cookie에 전달한다.
 
-    return res
-      .status(200)
-      .json({ token : accessToken });
+    return res.status(200).json({ token: accessToken });
   } catch (err) {
     res.status(400).send({ errorMessage: "로그인에 실패하였습니다." });
   }

@@ -8,6 +8,7 @@ const crypto = require("crypto");
 
 const { Users } = require("../models");
 const errorCheck = require("../middlewares/errorCheck")
+const authLogin = require("../middlewares/authLogin")
 
 const { Op } = require("sequelize");
 
@@ -25,7 +26,7 @@ const { Op } = require("sequelize");
 //        sign up - 회원가입
 //
 //==================================
-router.post("/signup", async (req, res) => {
+router.post("/signup", authLogin, async (req, res) => {
   try {
     // 닉네임, 비밀번호, 비밀번호 확인을 request에서 전달받기
     const { nickname, password, confirm } = req.body;
