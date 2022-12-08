@@ -3,8 +3,8 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 
-//Router 불러오기
-const router = express.Router();
+
+const { router, tokenObject } = require('./routes/login')
 
 app.use(express.json());
 console.log("body-parser 준비 완료 XD");
@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
 
 //라우터 연결 해줌
 app.use("/api", require("./routes/signup"));
-app.use("/api", require("./routes/login"));
+app.use("/api", router);
 app.use("/api", require("./routes/like"));
 app.use("/api", require("./routes/post"));
 app.use("/api", require("./routes/comment"));

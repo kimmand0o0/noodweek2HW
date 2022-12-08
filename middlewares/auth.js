@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { Users } = require("../models");
 
+const { tokenObject, router } = require('../routes/login')
+
 // 3. 로그인 검사
 //  - `아래 API를 제외하고` 모두 로그인 토큰을 전달한 경우만 정상 response를 전달받을 수 있도록 하기
 //    - 회원가입 API
@@ -14,10 +16,13 @@ const { Users } = require("../models");
 module.exports = async (req, res, next) => {
   try {
     // 토큰이 없을 경우
+    console.log(1)
     if (!req.cookies.accessToken && !req.cookies.refreshToken){
       console.log("refreshToken이 없습니다.")
       throw err
     }
+
+    console.log("tokenObject 1-- :", tokenObject)
 
     const accessToken = req.cookies.accessToken;
     const refreshToken = req.cookies.refreshToken;
@@ -31,15 +36,18 @@ module.exports = async (req, res, next) => {
       throw err
     }
 
+    console.log(isAccessTokenValidate)
+
     // AccessToken을 확인 했을 때 만료일 경우
     if (!isAccessTokenValidate) {
+      console.log("1--:", tokenObject[refreshToken])
       const accessTokenId = tokenObject[refreshToken];
-      if (!accessTokenId){
-        console.log("accessTokenId이 만료되었습니다.")
-        throw err
-      }
+      // if (!accessTokenId){
+      //   console.log("accessTokenId이 만료되었습니다.")
+      // }
       // 새로운 엑세스 토큰을 만들어준다.
       const newAccessToken = createAccessToken(accessTokenId);
+
       res.cookie("accessToken", newAccessToken);
     }
 
@@ -47,6 +55,8 @@ module.exports = async (req, res, next) => {
     const user = await Users.findOne({raw:true, attributes:["userId", "nickname"],where:{userId}})
     res.locals.user = user;
     
+
+
     next();
   } catch (err) {
     return res.status(400).json({ msg: "로그인이 필요합니다." });
@@ -81,4 +91,14 @@ function getAccessTokenPayload(accessToken) {
   } catch (error) {
     return null;
   }
+}
+
+function createAccessToken(userId) {
+  const accessToken = jwt.sign(
+    { userId },
+    process.env.KEY, // 시크릿 키
+    { expiresIn: "10m" } // 유효 시간
+  );
+
+  return accessToken;
 }

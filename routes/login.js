@@ -9,6 +9,8 @@ const { Users } = require("../models");
 
 const authLogin = require("../middlewares/authLogin")
 
+let tokenObject = {}
+
 // 2. 로그인 API
 // 닉네임, 비밀번호를 request에서 전달받기
 // 로그인 버튼을 누른 경우 닉네임과 비밀번호가 데이터베이스에 등록됐는지 확인한 뒤,
@@ -49,12 +51,17 @@ router.post("/login", authLogin, async (req, res) => {
         .json({ errorMessage: "닉네임 또는 패스워드를 확인해주세요." });
     }
 
+
+
     // 로그인 성공 시 로그인 토큰을 클라이언트에게 Cookie로 전달하기
     //tokenObject[refreshToken] = id; // Refresh Token을 가지고 해당 유저의 정보를 서버에 저장합니다.
     const accessToken = createAccessToken(existsUser.userId);
+    const refreshToken = createRefreshToken()
+    tokenObject[refreshToken] = existsUser.userId;
+
+    
     res.cookie("accessToken", accessToken); // Access Token을 Cookie에 전달한다.
     res.cookie("refreshToken", createRefreshToken()); // Refresh Token을 Cookie에 전달한다.
-
     return res.status(200).json({ token: accessToken });
   } catch (err) {
     res.status(400).send({ errorMessage: "로그인에 실패하였습니다." });
@@ -65,7 +72,7 @@ function createAccessToken(userId) {
   const accessToken = jwt.sign(
     { userId },
     process.env.KEY, // 시크릿 키
-    { expiresIn: "10m" } // 유효 시간
+    { expiresIn: "10s" } // 유효 시간
   );
 
   return accessToken;
@@ -74,7 +81,7 @@ function createAccessToken(userId) {
 // Refresh Token을 생성합니다.
 function createRefreshToken() {
   const refreshToken = jwt.sign(
-    {}, // JWT 데이터z
+    { }, // JWT 데이터z
     process.env.KEY, // 시크릿 키
     { expiresIn: "7d" } // Refresh Token이 7일 뒤에 만료되도록 설정합니다.
   );
@@ -82,4 +89,6 @@ function createRefreshToken() {
   return refreshToken;
 }
 
-module.exports = router;
+
+
+module.exports = { router, tokenObject }
