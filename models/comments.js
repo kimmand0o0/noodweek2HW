@@ -47,15 +47,6 @@ module.exports = (sequelize, DataTypes) => {
         },
         onDelete: 'cascade',
       },
-      nickname: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        references: {
-          model: "Users",
-          key: "nickname",
-        },
-        onDelete: "cascade",
-      },
       comment: {
         type: DataTypes.STRING,
         allowNull: false,

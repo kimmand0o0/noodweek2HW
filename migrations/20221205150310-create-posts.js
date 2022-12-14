@@ -22,15 +22,6 @@ module.exports = {
         type: Sequelize.DataTypes.STRING,
         allowNull: false,
       },
-      nickname: {
-        type: Sequelize.DataTypes.STRING,
-        allowNull: false,
-        references: {
-          model: "Users",
-          key: "nickname",
-        },
-        onDelete: "cascade",
-      },
       content: {
         type: Sequelize.DataTypes.STRING,
         allowNull: false,

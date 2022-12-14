@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 
 
-const { router, tokenObject } = require('./routes/login')
+const { tokenObject } = require('./controller/login.controller')
 
 app.use(express.json());
 console.log("body-parser 준비 완료 XD");
@@ -22,11 +22,7 @@ app.get("/", (req, res) => {
 });
 
 //라우터 연결 해줌
-app.use("/api", require("./routes/signup"));
-app.use("/api", router);
-app.use("/api", require("./routes/like"));
-app.use("/api", require("./routes/post"));
-app.use("/api", require("./routes/comment"));
+app.use("/api", require("./routes/index"));
 
 app.use((error, req, res, next) => {
   res
